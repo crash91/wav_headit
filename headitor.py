@@ -6,6 +6,7 @@ import struct
 
 # @dataclass
 class wav_header:
+    header_data: bytes
     riff: str = 'RIFF'
     file_size: int
     wave: str = 'WAVE'
@@ -25,6 +26,7 @@ class wav_header:
     data_size: int
 
     def unpack_header(self, header_data):
+        self.header_data = header_data
         self.riff = struct.unpack('>cccc', header_data[:4]) # 'RIFF'
         self.file_size = struct.unpack('<I', header_data[4:8]) 
         self.wave = struct.unpack('>cccc', header_data[8:12]) # 'WAVE'
@@ -47,23 +49,59 @@ class wav_header:
         pass
 
 
-def update_fields():
+def update_fields(header_data):
     for i in range(4):
+        textboxes[i].delete(0, END)
         textboxes[i].insert(0, header.riff[i])
     
-    # for i in range(4, 8):
-        # textboxes[i].insert(0, str(header.file_size))
+    for i in range(4, 8):
+        textboxes[i].delete(0, END)
+        textboxes[i].insert(0, hex(header_data[i]))
 
     for i in range(8,12):
+        textboxes[i].delete(0, END)
         textboxes[i].insert(0, header.wave[i-8])
 
     for i in range(12,16):
+        textboxes[i].delete(0, END)
         textboxes[i].insert(0, header.fmt_chunk[i-12])
 
-    # for i in range(16,20):
-        #textboxes[i].insert(0, header.fmt_chunk_size)
+    for i in range(16,20):
+        textboxes[i].delete(0, END)
+        textboxes[i].insert(0, hex(header_data[i]))
 
+    for i in range(20,22):
+        textboxes[i].delete(0, END)
+        textboxes[i].insert(0, hex(header_data[i]))
+
+    for i in range(22,24):
+        textboxes[i].delete(0, END)
+        textboxes[i].insert(0, hex(header_data[i]))
+
+    for i in range(24,28):
+        textboxes[i].delete(0, END)
+        textboxes[i].insert(0, hex(header_data[i]))
+
+    for i in range(28,32):
+        textboxes[i].delete(0, END)
+        textboxes[i].insert(0, hex(header_data[i]))
+
+    for i in range(32,34):
+        textboxes[i].delete(0, END)
+        textboxes[i].insert(0, hex(header_data[i]))
+
+    for i in range(34,36):
+        textboxes[i].delete(0, END)
+        textboxes[i].insert(0, hex(header_data[i]))
+
+    for i in range(36,40):
+        textboxes[i].delete(0, END)
+        textboxes[i].insert(0, header.data_chunk[i-36])
     
+    for i in range(40,44):
+        textboxes[i].delete(0, END)
+        textboxes[i].insert(0, hex(header_data[i]))
+
 
 ''' Button methods '''
 # populate fields when opening file
@@ -77,7 +115,7 @@ def open_btn_click():
         header_data = wavfile.read(44)
 
     header.unpack_header(header_data)
-    update_fields()
+    update_fields(header_data)
 
 def write_btn_click():
     pass
@@ -106,8 +144,8 @@ textboxes = []
 for byte_num in range(44):
     r = 2*(byte_num//8) + 3
     c = byte_num%8
-    textboxes.append(Entry(window, width=4))
-    textboxes[-1].grid(row=r, column=c)
+    textboxes.append(Entry(window, width=1, justify=CENTER, relief=FLAT))
+    textboxes[-1].grid(row=r, column=c, ipadx=15)
 
 window.mainloop()
 
